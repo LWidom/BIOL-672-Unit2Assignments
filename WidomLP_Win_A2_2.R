@@ -1,7 +1,7 @@
 # Louis Widom
 # lpw8274@rit.edu
 # Designed in Windows 10
-# Last updated 06 November 2020
+# Last updated 12 November 2020
 
 # List of required packages:
 #  caret
@@ -10,7 +10,6 @@
 #  e1071
 #  ggplot2
 #  grid
-##  imager
 #  kernlab
 #  liquidSVM
 #  MASS
@@ -27,7 +26,6 @@ library('dplyr')
 library('e1071')
 library('ggplot2')
 library('grid')
-#library('imager')
 library('kernlab')
 library('liquidSVM')
 library('MASS')
@@ -314,27 +312,5 @@ model_bar <- ggplot(model.summary,aes(x=variable,y=mean)) + geom_col(position="d
 pdf('SVM comparison.pdf')
 print(model_bar)
 dev.off()
-print('Scatterplot guide: The top images show the training subset, the middle images show the testing
-      subset, and the bottom images show the model predictions.')
-print('Of the different combinations of support vector machines and kernel functions tested, ksvm (from
-      the kernlab package) with a linear kernel or polynomial kernel had the best performance. In both
-      cases, the accuracy was equal to 1.0. The results can be observed in \'SVM comparison.pdf\'. Most
-      of the SVM methods performed better than the methods featured in \'WidomLP_Win_A1.R\' except for svm
-      from the e1071 library when a linear or polynomial kernel was specified.')
-
-#========================================================================================================
-# Running liquidSVM on a large scale problem
-
-
-# Read in "Blood Cell Images" dataset available from Paul Mooney
-# (available: https://www.kaggle.com/paultimothymooney/blood-cells)
-# imagepath = paste(getwd(),'/dataset2-master/dataset2-master/images',sep='')
-# trainfiles_EOSINOPHIL <- list.files(path = paste(imagepath,'/TRAIN/EOSINOPHIL',sep=''), pattern = "*.jpeg", full.names=TRUE)
-# trainfiles_LYMPHOCYTE <- list.files(path = paste(imagepath,'/TRAIN/LYMPHOCYTE',sep=''), pattern = "*.jpeg", full.names=TRUE)
-# trainfiles_MONOCYTE <- list.files(path = paste(imagepath,'/TRAIN/MONOCYTE',sep=''), pattern = "*.jpeg", full.names=TRUE)
-# trainfiles_NEUTROPHIL <- list.files(path = paste(imagepath,'/TRAIN/NEUTROPHIL',sep=''), pattern = "*.jpeg", full.names=TRUE)
-# trainIm_EOSINOPHIL <- lapply(trainfiles_EOSINOPHIL, load.image )
-# trainIm_LYMPHOCYTE <- lapply(trainfiles_LYMPHOCYTE, load.image )
-# trainIm_MONOCYTE <- lapply(trainfiles_MONOCYTE, load.image )
-# trainIm_NEUTROPHIL <- lapply(trainfiles_NEUTROPHIL, load.image )
-
+print('Scatterplot guide: The top images show the training subset, the middle images show the testing subset, and the bottom images show the model predictions.')
+print('Of the different combinations of support vector machines and kernel functions tested, ksvm (from the kernlab package) with a linear kernel or polynomial kernel had the best performance. In both cases, the accuracy was equal to 1.0. The results can be observed in \'SVM comparison.pdf\'. Most of the SVM methods performed better than the methods featured in \'WidomLP_Win_A1.R\' except for svm from the e1071 library when a linear or polynomial kernel was specified.')
