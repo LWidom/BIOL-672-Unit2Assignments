@@ -14,6 +14,7 @@
 #  plyr
 #  reshape2
 #  tensorflow
+#  tictoc
 # Associated data files (should be located in the same folder as this script):
 #  winequality-red.csv
 # ======================================================================================
@@ -29,6 +30,7 @@ library('neuralnet')
 library('plyr')
 library('reshape2')
 library('tensorflow')
+library('tictoc')
 # Set the working directory to be the same location as this script
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
@@ -170,70 +172,115 @@ for(i in 1:1)
   }
   
   # Build the deep net model
+  # Measure the speed
   tic("time elapsed")
-  model <- keras_model_sequential()
-  model %>%
-#    layer_flatten(input_shape = c(32, 32, 3)) %>%
-    layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
-    layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
-    layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
-    layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
-    layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
-    layer_flatten() %>%
-    layer_dense(units = 10, activation = 'softmax')
-  
-  # Compile the model
-  model %>% compile(
-    optimizer = 'adam', 
-    loss = 'sparse_categorical_crossentropy',
-    metrics = c('accuracy')
-  )
-  
-  # Train model and summarize it 
-  model %>% fit(train_images, train_labels, epochs = 10, verbose = 2)
-  print(model)
-  
-  # Make probabilistic predictions
-  predictions <- model %>% predict(test_images)
-  print(predictions[1,]) # Print first prediction
-  print(which.max(predictions[1,])) # Print which of 10 classes wins
-  # get class predictions
-  class_pred <- model %>% predict_classes(test_images)
-  print(class_pred[1:20]) # Print first 20 predictions
-  
-  # Plot some classifications
-  par(mfcol=c(5,5))
-  par(mar=c(0, 0, 1.5, 0), xaxs='i', yaxs='i')
-  for (i in 1:25) { 
-    img <- test_images[i, , , ]
-#    img <- t(apply(img, 2, rev)) 
-    # Subtract 1 as labels go from 0 to 9
-    predicted_label <- which.max(predictions[i, ]) - 1
-    true_label <- test_labels[i]
-    if (predicted_label == true_label) {
-      color <- '#008800' # Green font
-    } else {
-      color <- '#bb0000' # Red font
+  # Initialize list to store the model's accuracy
+  resultsDeepNet <- vector(mode="list",length=5)
+  # Loop five times to examine the effects of added layers
+  for (j in 1:5) {
+    model <- keras_model_sequential()
+    # Add a new convolutional 2D layer each time through the loop
+    if (j==1){
+      model %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
+        layer_flatten() %>%
+        layer_dense(units = 10, activation = 'softmax')
     }
-#    post_image <- image(1:32, 1:32, img, col = gray((0:255)/255), xaxt = 'n', yaxt = 'n',
+    if (j==2){
+      model %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_flatten() %>%
+        layer_dense(units = 10, activation = 'softmax')
+    }
+    if (j==3){
+      model %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_flatten() %>%
+        layer_dense(units = 10, activation = 'softmax')
+    }
+    if (j==4){
+      model %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_flatten() %>%
+        layer_dense(units = 10, activation = 'softmax')
+    }
+    if (j==5){
+      model %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3),padding = "same",input_shape = c(32, 32, 3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_conv_2d(filter = 32, kernel_size = c(3,3), activation = 'relu') %>%
+        layer_flatten() %>%
+        layer_dense(units = 10, activation = 'softmax')
+    }
+    # Compile the model
+    model %>% compile(
+      optimizer = 'adam', 
+      loss = 'sparse_categorical_crossentropy',
+      metrics = c('accuracy')
+    )
+  
+    # Train model and summarize it 
+    model %>% fit(train_images, train_labels, epochs = 10, verbose = 2)
+    print(model)
+  
+    # Make probabilistic predictions
+    predictions <- model %>% predict(test_images)
+    print(predictions[1,]) # Print first prediction
+    print(which.max(predictions[1,])) # Print which of 10 classes wins
+    # get class predictions
+    class_pred <- model %>% predict_classes(test_images)
+    print(class_pred[1:20]) # Print first 20 predictions
+  
+    # Plot some classifications
+    par(mfcol=c(5,5))
+    par(mar=c(0, 0, 1.5, 0), xaxs='i', yaxs='i')
+    for (i in 1:25) { 
+      img <- test_images[i, , , ]
+#     img <- t(apply(img, 2, rev)) 
+      # Subtract 1 as labels go from 0 to 9
+      predicted_label <- which.max(predictions[i, ]) - 1
+      true_label <- test_labels[i]
+      if (predicted_label == true_label) {
+        color <- '#008800' # Green font
+      } else {
+        color <- '#bb0000' # Red font
+      }
+#     post_image <- image(1:32, 1:32, img, col = gray((0:255)/255), xaxt = 'n', yaxt = 'n',
 #                        main = paste0(class_names[predicted_label + 1], " (",
 #                                      class_names[true_label + 1], ")"),
 #                        col.main = color)
-    # Create a matrix to hold the RGB values
-    rgb.mat<-array(dim=c(32,32,3))
-    rgb.mat[,,1]<-img[,,1]
-    rgb.mat[,,2]<-img[,,2]
-    rgb.mat[,,3]<-img[,,3]
-    plot.new()
-    post_image <-rasterImage(rgb.mat,0,0,1,1,xaxt='n',yaxt='n') +
-      title(paste0(class_names[predicted_label + 1]," (",class_names[true_label +1],")"),col.main=color)
-  }
+      # Create a matrix to hold the RGB values
+      rgb.mat<-array(dim=c(32,32,3))
+      rgb.mat[,,1]<-img[,,1]
+      rgb.mat[,,2]<-img[,,2]
+      rgb.mat[,,3]<-img[,,3]
+      plot.new()
+      post_image <-rasterImage(rgb.mat,0,0,1,1,xaxt='n',yaxt='n') +
+        title(paste0(class_names[predicted_label + 1]," (",class_names[true_label +1],")"),col.main=color)
+    }
   
-  # Generate Confusion matrix
-  mymatrix_1 <- confusionMatrix(as.factor(class_pred), as.factor(test_labels))
-  print(mymatrix_1)
-  print(pre_image)
-  print(post_image)
+    # Generate Confusion matrix
+    mymatrix_1 <- confusionMatrix(as.factor(class_pred), as.factor(test_labels))
+    print(mymatrix_1)
+    print(pre_image)
+    print(post_image)
+    # Store the accuracy in a list
+    resultsDeepNet[j] = mymatrix_1$overall[1]
+    }
   toc() # Print elapsed time
-  
+#  DeepNetAccuracy <- data.frame(resultsDeepNet)
+  Accuracies <- unlist(resultsDeepNet)
+  Number_of_Hidden_Layers <- 1:5
+  DeepNetAccuracy1 <- data.frame(Number_of_Hidden_Layers,Accuracies)
+  DeepNetPlot <- ggplot(DeepNetAccuracy1, aes(x=Number_of_Hidden_Layers, y=Accuracies, group=1)) +
+    geom_line() + geom_point()
+  print(DeepNetPlot)
 }
